@@ -7,92 +7,113 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#070a12; --panel:#111a2b; --panel2:#0e1626; --line:#233149;
+    --bg:#070a12; --panel:#111a2b; --panel2:#0d1524; --line:#233149; --line2:#2c3c58;
     --txt:#eef2f9; --mut:#93a4c4; --acc:#5b8cff; --acc2:#9a6bff; --grad:linear-gradient(120deg,#5b8cff,#9a6bff);
-    --pos:#34d17f; --neg:#e74c3c; --warn:#f2c94c;
+    --pos:#34d17f; --neg:#e74c3c; --warn:#f2c94c; --mono:'JetBrains Mono',monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Inter',system-ui,Arial;background:var(--bg);color:var(--txt);-webkit-font-smoothing:antialiased;line-height:1.55}
   .glow{position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background:radial-gradient(700px 380px at 15% -5%,rgba(91,140,255,.16),transparent 60%),
-               radial-gradient(680px 400px at 90% 0%,rgba(154,107,255,.14),transparent 60%)}
+    background:radial-gradient(760px 400px at 12% -8%,rgba(91,140,255,.18),transparent 60%),
+               radial-gradient(720px 420px at 92% -2%,rgba(154,107,255,.15),transparent 60%)}
   a{color:inherit;text-decoration:none}
   .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
-  .tape{background:var(--warn);color:#241c00;text-align:center;font-size:12.5px;font-weight:600;padding:7px}
-  /* nav */
-  nav{border-bottom:1px solid var(--line);background:rgba(7,10,18,.7);backdrop-filter:blur(12px)}
+  .tape{background:linear-gradient(90deg,#f2c94c,#f2a94c);color:#241c00;text-align:center;font-size:12.5px;font-weight:600;padding:7px}
+  nav{border-bottom:1px solid var(--line);background:rgba(7,10,18,.72);backdrop-filter:blur(14px);position:sticky;top:0;z-index:40}
   nav .row{display:flex;align-items:center;gap:16px;height:62px}
   .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:19px;letter-spacing:-.3px}
-  .brand .m{width:33px;height:33px;border-radius:10px;background:var(--grad);display:grid;place-items:center;
-    box-shadow:0 6px 18px rgba(91,140,255,.4)}
-  .back{margin-left:auto;color:var(--mut);font-size:14px}.back:hover{color:var(--txt)}
+  .brand .m{width:33px;height:33px;border-radius:10px;background:var(--grad);display:grid;place-items:center;box-shadow:0 6px 18px rgba(91,140,255,.4)}
+  .back{margin-left:auto;color:var(--mut);font-size:14px;transition:.15s}.back:hover{color:var(--txt)}
   .seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden}
-  .seg button{background:transparent;color:var(--mut);border:0;padding:9px 18px;font:600 13.5px 'Inter';cursor:pointer}
+  .seg button{background:transparent;color:var(--mut);border:0;padding:9px 18px;font:600 13.5px 'Inter';cursor:pointer;transition:.15s}
   .seg button.on{background:var(--grad);color:#fff}
-  .head{padding:22px 0 6px}
-  .head h1{font-size:23px;font-weight:800;letter-spacing:-.6px}
+  .head{padding:24px 0 6px}
+  .head h1{font-size:24px;font-weight:800;letter-spacing:-.6px}
   .head p{color:var(--mut);font-size:13.5px;margin-top:4px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
   h2{font-size:14px;color:#cfe0ff;margin:20px 4px 10px;font-weight:700;letter-spacing:-.2px}
   /* wizard */
   .stepper{display:flex;gap:8px;margin:18px 0;flex-wrap:wrap}
-  .st{flex:1;min-width:120px;display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:11px;
-    background:var(--panel);border:1px solid var(--line);color:var(--mut);font-size:12.5px;font-weight:500}
-  .st .n{width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:var(--panel2);font-size:12px;font-weight:700}
+  .st{flex:1;min-width:118px;display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:11px;background:var(--panel);border:1px solid var(--line);color:var(--mut);font-size:12.5px;font-weight:500;transition:.2s}
+  .st .n{width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:var(--panel2);font-size:12px;font-weight:700;transition:.2s}
   .st.on{border-color:var(--acc);color:var(--txt)} .st.on .n{background:var(--grad);color:#fff}
   .st.done .n{background:var(--pos);color:#04231a}
-  .step{display:none} .step.on{display:block;animation:fade .25s ease}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  .step h3{font-size:21px;font-weight:800;letter-spacing:-.5px}
+  .step{display:none} .step.on{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .step h3{font-size:22px;font-weight:800;letter-spacing:-.5px}
   .step .lead{color:var(--mut);font-size:13.5px;margin:6px 0 20px}
   label{display:block;font-size:12.5px;color:var(--mut);margin:13px 0 6px;font-weight:500}
-  input,select{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;
-    padding:12px 13px;font:400 14px 'Inter';outline:none}
+  input,select{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:12px 13px;font:400 14px 'Inter';outline:none;transition:.15s}
   input:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(91,140,255,.12)}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .btn{font:600 14px 'Inter';border:0;border-radius:11px;padding:12px 22px;cursor:pointer;transition:.15s;
-    display:inline-flex;align-items:center;gap:8px}
-  .btn.p{background:var(--grad);color:#fff;box-shadow:0 8px 22px rgba(91,140,255,.32)}.btn.p:hover{transform:translateY(-1px)}
-  .btn.g{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--txt)}
+  .btn{font:600 14px 'Inter';border:0;border-radius:11px;padding:12px 22px;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:8px}
+  .btn.p{background:var(--grad);color:#fff;box-shadow:0 8px 22px rgba(91,140,255,.32)}.btn.p:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(91,140,255,.42)}
+  .btn.g{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--txt)}.btn.g:hover{border-color:var(--acc)}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
   .nav2{display:flex;justify-content:space-between;margin-top:24px}
   .qr{width:172px;height:172px;border-radius:14px;background:#fff;display:grid;place-items:center;margin:8px auto;padding:11px}
   .qr svg{width:100%;height:100%}
-  .pick{display:flex;align-items:center;gap:13px;padding:14px;border:1px solid var(--line);border-radius:13px;
-    background:var(--panel2);margin-bottom:11px;cursor:pointer;transition:.15s}
-  .pick:hover{border-color:#33456a} .pick.sel{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+  /* channel connect tabs */
+  .ctabs{display:flex;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:18px}
+  .ctab{flex:1;text-align:center;padding:10px;border-radius:9px;color:var(--mut);font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s}
+  .ctab.on{background:var(--panel);color:var(--txt);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+  .ctab .b{font-size:10px;color:var(--acc2);font-weight:700;margin-left:6px;border:1px solid #3b2f6b;background:#1b1636;padding:1px 6px;border-radius:10px}
+  .cpane{display:none}.cpane.on{display:block;animation:fade .25s ease}
+  .pick{display:flex;align-items:center;gap:13px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);margin-bottom:11px;cursor:pointer;transition:.15s}
+  .pick:hover{border-color:var(--line2)} .pick.sel{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
   .pick .ic{width:40px;height:40px;border-radius:11px;background:#1b2740;display:grid;place-items:center;font-size:19px}
-  .pick .t{font-weight:600;font-size:14.5px} .pick .d{font-size:12.5px;color:var(--mut);margin-top:2px}
-  .pick .chk{margin-left:auto;color:var(--acc);font-weight:700;font-size:12px;opacity:0}.pick.sel .chk{opacity:1}
-  .pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;background:var(--panel2);border:1px solid var(--line);
-    padding:7px 13px;border-radius:22px;color:var(--mut)}
-  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--mut)}
-  .dot.g{background:var(--pos);box-shadow:0 0 8px var(--pos)}
-  .ok{color:var(--pos)} .muted{color:var(--mut)}
+  .pick .t{font-weight:600;font-size:14.5px;display:flex;align-items:center;gap:8px}
+  .vbadge{font-size:9.5px;color:var(--pos);border:1px solid #1f5334;background:#0f2318;padding:1px 7px;border-radius:10px;font-weight:700}
+  .pick .d{font-size:12.5px;color:var(--mut);margin-top:2px} .pick .chk{margin-left:auto;color:var(--acc);font-weight:700;font-size:12px;opacity:0}.pick.sel .chk{opacity:1}
+  /* AI detect */
+  .airow{display:flex;gap:10px}.airow input{flex:1}
+  .ai-stage{margin-top:18px;border:1px solid var(--line);border-radius:14px;background:var(--panel2);overflow:hidden;display:none}
+  .ai-stage.show{display:block;animation:fade .3s ease}
+  .ai-scan{padding:22px}
+  .scanline{display:flex;align-items:center;gap:11px;font-size:13.5px;color:var(--mut);padding:7px 0;opacity:.35;transition:.3s}
+  .scanline.act{opacity:1;color:var(--txt)} .scanline.done .ic{background:#0f2318;color:var(--pos);border-color:#1f5334}
+  .scanline .ic{width:26px;height:26px;border-radius:8px;border:1px solid var(--line);background:var(--panel);display:grid;place-items:center;font-size:13px;flex:none}
+  .spin{width:15px;height:15px;border:2px solid var(--line);border-top-color:var(--acc);border-radius:50%;animation:sp .7s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .ai-result{border-top:1px solid var(--line);padding:20px;display:none}.ai-result.show{display:block;animation:fade .3s ease}
+  .conf{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .conf .big{font-size:15px;font-weight:700;color:var(--pos)}
+  .bar{flex:1;height:7px;border-radius:6px;background:var(--panel);overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#34d17f,#7ce6a8);transition:width 1s ease}
+  .parse{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .parse .box{border:1px solid var(--line);border-radius:11px;padding:14px;background:var(--panel)}
+  .parse .h{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);margin-bottom:9px;font-weight:600}
+  .raw{font-family:var(--mono);font-size:12px;line-height:1.9;color:#c6d3ea}
+  .raw .hl{background:rgba(91,140,255,.18);border-radius:4px;padding:1px 3px;color:#cfe0ff}
+  .field{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .field:last-child{border:0} .field .k{color:var(--mut)} .field .v{font-family:var(--mono);font-weight:600}
+  .field .v.sell{color:var(--neg)} .field .v.buy{color:var(--pos)}
+  @media(max-width:720px){.parse{grid-template-columns:1fr}}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;background:var(--panel2);border:1px solid var(--line);padding:7px 13px;border-radius:22px;color:var(--mut)}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--mut)}.dot.g{background:var(--pos);box-shadow:0 0 8px var(--pos)}
+  .ok{color:var(--pos)}.muted{color:var(--mut)}
   /* dashboard */
-  .statusbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--line);
-    border-radius:14px;padding:13px 15px;margin:16px 0 14px}
+  .statusbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin:16px 0 14px}
   .toggle{margin-left:auto;display:flex;align-items:center;gap:11px;font-size:13px}
   .switch{width:46px;height:26px;border-radius:20px;background:#2c3a54;position:relative;cursor:pointer;transition:.2s}
-  .switch.on{background:var(--pos)} .switch .k{width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
-  .switch.on .k{left:23px}
+  .switch.on{background:var(--pos)}.switch .k{width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.4)}.switch.on .k{left:23px}
   .badges{display:flex;gap:9px;flex-wrap:wrap;margin:4px 0 2px}
-  .badge{display:flex;align-items:center;gap:7px;font-size:12px;background:#0f2318;border:1px solid #1f5334;color:#79e2a4;
-    padding:7px 12px;border-radius:22px;font-weight:500}
+  .badge{display:flex;align-items:center;gap:7px;font-size:12px;background:#0f2318;border:1px solid #1f5334;color:#79e2a4;padding:7px 12px;border-radius:22px;font-weight:500}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin-top:12px}
   .kpi .l{color:var(--mut);font-size:12px}.kpi .v{font-size:23px;font-weight:800;margin-top:5px;letter-spacing:-.6px}
   .two{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-top:14px}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
   th{color:var(--mut);font-weight:600;background:#0f1826;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  td{font-variant-numeric:tabular-nums}
   .feed{max-height:262px;overflow:auto}
   .row2{display:flex;gap:11px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line);font-size:13px}
   .tm{color:var(--mut);width:74px;flex:none;font-variant-numeric:tabular-nums}
   .tag{font-size:10.5px;padding:3px 9px;border-radius:20px;font-weight:600;flex:none}
-  .tag.op{background:#0f2318;color:#79e2a4}.tag.tp{background:#0e2038;color:#7fb0ff}
-  .tag.cl{background:#2a1416;color:#f2a1a1}.tag.info{background:#1a2236;color:#9fb2d0}
+  .tag.op{background:#0f2318;color:#79e2a4}.tag.tp{background:#0e2038;color:#7fb0ff}.tag.cl{background:#2a1416;color:#f2a1a1}.tag.info{background:#1a2236;color:#9fb2d0}
   .stat{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0}
   .foot{color:var(--mut);font-size:11.5px;text-align:center;margin:24px 0 12px}
   @media(max-width:820px){.two{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
@@ -116,25 +137,72 @@
     <div class="head"><h1>Set up CopyPilot</h1><p>Guided setup — no coding, no config files. (Demo — nothing is saved.)</p></div>
     <div class="stepper" id="stepper"></div>
     <div class="card">
+      <!-- 1 license -->
       <div class="step on" data-s="0">
         <h3>Activate your license</h3><div class="lead">Enter the key from your purchase email. Each key locks to one computer.</div>
         <label>License key</label><input value="CP-XAUHQ-4F9A-22B7-QK31" spellcheck="false">
         <label>Email</label><input value="you@email.com">
         <div class="nav2"><span></span><button class="btn p" onclick="go(1)">Activate →</button></div>
       </div>
+      <!-- 2 telegram -->
       <div class="step" data-s="1">
         <h3>Connect Telegram</h3><div class="lead">Scan with Telegram on your phone → Settings → Devices → Link Desktop Device. Your session stays on your PC — we never see it.</div>
         <div class="qr" id="qr"></div>
         <div style="text-align:center" class="muted">Waiting for scan… <span class="ok" id="tgok" style="display:none">✓ Linked as @you</span></div>
         <div class="nav2"><button class="btn g" onclick="go(0)">← Back</button><button class="btn p" onclick="go(2)">Continue →</button></div>
       </div>
+      <!-- 3 channel (verified list + AI) -->
       <div class="step" data-s="2">
-        <h3>Choose your signals channel</h3><div class="lead">Pick the channel you're subscribed to — CopyPilot understands each provider's exact format.</div>
-        <div class="pick sel" onclick="pickGrp(this)"><div class="ic">🏛️</div><div><div class="t">XAUHQ VIP</div><div class="d">Gold · SELL/BUY + TP1–TP4 ladder · zone limits</div></div><div class="chk">SELECTED ✓</div></div>
-        <div class="pick" onclick="pickGrp(this)"><div class="ic">⚜️</div><div><div class="t">Gold Platinum VIP</div><div class="d">Gold · market + second-limit grid · breakeven mgmt</div></div><div class="chk">SELECTED ✓</div></div>
-        <div class="pick" onclick="pickGrp(this)"><div class="ic">📈</div><div><div class="t">FX Majors Signals</div><div class="d">EURUSD/GBPUSD · single entry + SL/TP</div></div><div class="chk">SELECTED ✓</div></div>
+        <h3>Connect your signals channel</h3><div class="lead">Pick a verified channel, or connect <b>any</b> channel and let AI learn its format.</div>
+        <div class="ctabs">
+          <div class="ctab on" id="ctVer" onclick="ctab('ver')">Verified channels</div>
+          <div class="ctab" id="ctAI" onclick="ctab('ai')">Connect any channel <span class="b">AI · BETA</span></div>
+        </div>
+        <!-- verified -->
+        <div class="cpane on" id="paneVer">
+          <div class="pick sel" onclick="pickGrp(this)"><div class="ic">🏛️</div><div><div class="t">XAUHQ VIP <span class="vbadge">VERIFIED</span></div><div class="d">Gold · SELL/BUY + TP1–TP4 ladder · zone limits</div></div><div class="chk">SELECTED ✓</div></div>
+          <div class="pick" onclick="pickGrp(this)"><div class="ic">⚜️</div><div><div class="t">Gold Platinum VIP <span class="vbadge">VERIFIED</span></div><div class="d">Gold · market + second-limit grid · breakeven mgmt</div></div><div class="chk">SELECTED ✓</div></div>
+          <div class="pick" onclick="pickGrp(this)"><div class="ic">📈</div><div><div class="t">FX Majors Signals <span class="vbadge">VERIFIED</span></div><div class="d">EURUSD/GBPUSD · single entry + SL/TP</div></div><div class="chk">SELECTED ✓</div></div>
+        </div>
+        <!-- AI -->
+        <div class="cpane" id="paneAI">
+          <label>Your channel link or @username</label>
+          <div class="airow">
+            <input id="chLink" value="t.me/mygoldsignals" spellcheck="false">
+            <button class="btn p" id="analyzeBtn" onclick="analyze()">✨ Analyze with AI</button>
+          </div>
+          <div class="muted" style="font-size:12px;margin-top:8px">CopyPilot reads your last messages and learns the format automatically. Beta — always confirm the first few trades.</div>
+          <div class="ai-stage" id="aiStage">
+            <div class="ai-scan">
+              <div class="scanline" id="sl1"><span class="ic"><span class="spin"></span></span> Reading last 20 messages from <b style="margin-left:4px">@mygoldsignals</b></div>
+              <div class="scanline" id="sl2"><span class="ic"><span class="spin"></span></span> Detecting entries, stop-loss &amp; take-profit…</div>
+              <div class="scanline" id="sl3"><span class="ic"><span class="spin"></span></span> Learning management rules (BE, partials, re-entry)…</div>
+            </div>
+            <div class="ai-result" id="aiResult">
+              <div class="conf"><span class="big">✓ Format detected</span><div class="bar"><i id="confbar"></i></div><span class="muted" id="confpct">96%</span></div>
+              <div class="parse">
+                <div class="box"><div class="h">Sample message</div>
+                  <div class="raw"><span class="hl">GOLD SELL</span> now <span class="hl">4127</span><br>Stop loss <span class="hl">4137</span><br>Take profit <span class="hl">4117</span> / 4105<br>Move SL to BE at +30 pips</div>
+                </div>
+                <div class="box"><div class="h">CopyPilot understood</div>
+                  <div class="field"><span class="k">Direction</span><span class="v sell">SELL</span></div>
+                  <div class="field"><span class="k">Entry</span><span class="v">4127 (market)</span></div>
+                  <div class="field"><span class="k">Stop loss</span><span class="v">4137</span></div>
+                  <div class="field"><span class="k">Take profit</span><span class="v">4117 · 4105</span></div>
+                  <div class="field"><span class="k">Management</span><span class="v">Move to BE +30</span></div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap">
+                <button class="btn p" onclick="pickAI()">Use this channel ✓</button>
+                <span class="muted" style="font-size:12.5px">Sanity checks pass · SL on correct side · price near market</span>
+              </div>
+            </div>
+          </div>
+          <div class="pill" id="aiPicked" style="display:none;margin-top:14px"><span class="dot g"></span> Connected ·&nbsp;<b>@mygoldsignals</b>&nbsp;(AI format)</div>
+        </div>
         <div class="nav2"><button class="btn g" onclick="go(1)">← Back</button><button class="btn p" onclick="go(3)">Continue →</button></div>
       </div>
+      <!-- 4 mt5 -->
       <div class="step" data-s="3">
         <h3>Connect MetaTrader</h3><div class="lead">CopyPilot attaches to your MT5 terminal. Log it into your broker and keep it open.</div>
         <div class="row"><div><label>Platform</label><select><option>MetaTrader 5</option><option>MetaTrader 4</option></select></div><div><label>Broker server</label><input value="Tickmill-Demo"></div></div>
@@ -142,6 +210,7 @@
         <div class="pill" style="margin-top:15px"><span class="dot g"></span> Terminal detected ·&nbsp;<b>Algo Trading enabled</b>&nbsp;· balance $10,000.00</div>
         <div class="nav2"><button class="btn g" onclick="go(2)">← Back</button><button class="btn p" onclick="go(4)">Continue →</button></div>
       </div>
+      <!-- 5 risk -->
       <div class="step" data-s="4">
         <h3>Risk &amp; lot settings</h3><div class="lead">How much to trade per signal. Start small on a demo account first.</div>
         <div class="row"><div><label>Symbol</label><input value="XAUUSD"></div><div><label>Lot size per entry</label><input value="0.10"></div></div>
@@ -221,6 +290,22 @@
   function go(n){cur=n;drawStepper();document.querySelectorAll('.step').forEach(el=>el.classList.toggle('on',+el.dataset.s===n));
     if(n===1)setTimeout(()=>{const e=document.getElementById('tgok');if(e)e.style.display='inline';},1300);window.scrollTo({top:0,behavior:'smooth'});}
   function pickGrp(el){document.querySelectorAll('.pick').forEach(p=>p.classList.remove('sel'));el.classList.add('sel');}
+  function ctab(w){document.getElementById('ctVer').classList.toggle('on',w==='ver');document.getElementById('ctAI').classList.toggle('on',w==='ai');
+    document.getElementById('paneVer').classList.toggle('on',w==='ver');document.getElementById('paneAI').classList.toggle('on',w==='ai');}
+  // AI analyze animation
+  function analyze(){
+    const btn=document.getElementById('analyzeBtn');btn.disabled=true;btn.textContent='Analyzing…';
+    document.getElementById('aiStage').classList.add('show');
+    document.getElementById('aiResult').classList.remove('show');
+    ['sl1','sl2','sl3'].forEach(id=>{const e=document.getElementById(id);e.classList.remove('act','done');e.querySelector('.ic').innerHTML='<span class="spin"></span>';});
+    const seq=[['sl1',700],['sl2',1500],['sl3',2300]];
+    document.getElementById('sl1').classList.add('act');
+    seq.forEach(([id,t],i)=>{setTimeout(()=>{const e=document.getElementById(id);e.classList.add('act','done');e.querySelector('.ic').innerHTML='✓';
+      const nx=seq[i+1];if(nx)document.getElementById(nx[0]).classList.add('act');},t);});
+    setTimeout(()=>{document.getElementById('aiResult').classList.add('show');setTimeout(()=>document.getElementById('confbar').style.width='96%',60);
+      btn.disabled=false;btn.textContent='✨ Analyze with AI';},2900);
+  }
+  function pickAI(){document.getElementById('aiPicked').style.display='inline-flex';}
   function finish(){show('dash');}
   drawStepper();
   function show(v){document.getElementById('wiz').style.display=v==='wiz'?'block':'none';document.getElementById('dash').style.display=v==='dash'?'block':'none';

@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#070a12; --bg2:#0c111d; --panel:#121a2b; --panel2:#18223500; --line:#233149;
@@ -26,7 +26,19 @@
   .glow{position:fixed;inset:0;z-index:-1;pointer-events:none;
     background:
       radial-gradient(700px 380px at 15% -5%, rgba(91,140,255,.18), transparent 60%),
-      radial-gradient(680px 400px at 90% 5%, rgba(154,107,255,.16), transparent 60%);}
+      radial-gradient(680px 400px at 90% 5%, rgba(154,107,255,.16), transparent 60%);
+    animation:drift 14s ease-in-out infinite alternate}
+  @keyframes drift{from{transform:translate3d(-14px,0,0) scale(1)}to{transform:translate3d(18px,10px,0) scale(1.06)}}
+  /* AI parser showcase */
+  .ai-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:44px;align-items:stretch}
+  .ai-box{background:linear-gradient(180deg,#101a2b,#0c1220);border:1px solid var(--line);border-radius:16px;padding:22px}
+  .ai-box .h{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .raw{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:2.05;color:#c6d3ea}
+  .raw .hl{background:rgba(91,140,255,.2);border-radius:5px;padding:2px 5px;color:#dbe6ff}
+  .fld{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+  .fld:last-child{border:0} .fld .k{color:var(--mut)} .fld .v{font-family:'JetBrains Mono',monospace;font-weight:600}
+  .fld .v.sell{color:var(--neg)} .arrowmid{display:grid;place-items:center;color:var(--acc);font-size:26px}
+  @media(max-width:860px){.ai-wrap{grid-template-columns:1fr}}
   /* nav */
   nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(7,10,18,.7);border-bottom:1px solid var(--line)}
   nav .row{display:flex;align-items:center;gap:26px;height:66px}
@@ -139,6 +151,7 @@
   <div class="brand"><span class="m"><svg viewBox="0 0 40 40" width="21" height="21" fill="none" style="display:block"><path d="M7 20 L33 7 L25.5 33 L21 23 Z" fill="#fff"/><path d="M21 23 L33 7 L25.5 33 Z" fill="rgba(0,0,0,.2)"/></svg></span> CopyPilot</div>
   <div class="links">
     <a href="#features">Features</a>
+    <a href="#ai">Any channel</a>
     <a href="#how">How it works</a>
     <a href="#reliability">Reliability</a>
     <a href="#pricing">Pricing</a>
@@ -149,7 +162,7 @@
 
 <!-- HERO -->
 <header class="hero"><div class="wrap">
-  <div class="tagpill"><span class="dot"></span> Now copying Gold &amp; FX signals in real time</div>
+  <div class="tagpill"><span class="dot"></span> ✨ New — connect <b style="color:var(--txt);font-weight:600;margin:0 4px">any</b> channel with AI</div>
   <h1>Your Telegram signals,<br><span class="grad">traded automatically.</span></h1>
   <p class="lead">CopyPilot reads your signal channel and places the trades in MetaTrader for you —
      entries, stop-loss, take-profit, and management — with reliability built for 24/7 markets.</p>
@@ -197,6 +210,26 @@
     <div class="fcard"><div class="fic">🎛️</div><h3>Full management</h3><p>Move-to-breakeven, partial close, re-entry, and "cancel/remove" — exactly as the provider instructs.</p></div>
     <div class="fcard"><div class="fic">📊</div><h3>Live dashboard</h3><p>Balance, growth, open positions, and a real-time signal feed — private locally, or a shareable page.</p></div>
   </div>
+</div></section>
+
+<!-- AI UNIVERSAL PARSER -->
+<section id="ai" style="padding-top:20px"><div class="wrap">
+  <div class="eyebrow">Powered by AI</div>
+  <h2>Connect <span class="grad">any</span> channel</h2>
+  <p class="sec-sub">Every provider writes differently. CopyPilot's AI reads your channel and learns its exact format — no setup, no config files.</p>
+  <div class="ai-wrap">
+    <div class="ai-box"><div class="h">📨 A message from your channel</div>
+      <div class="raw"><span class="hl">GOLD SELL</span> now <span class="hl">4127</span><br>Stop loss <span class="hl">4137</span><br>Take profit <span class="hl">4117</span> / 4105<br>Move SL to BE at +30 pips</div>
+    </div>
+    <div class="ai-box"><div class="h">🧠 CopyPilot understood — 96% confidence</div>
+      <div class="fld"><span class="k">Direction</span><span class="v sell">SELL</span></div>
+      <div class="fld"><span class="k">Entry</span><span class="v">4127 (market)</span></div>
+      <div class="fld"><span class="k">Stop loss</span><span class="v">4137</span></div>
+      <div class="fld"><span class="k">Take profit</span><span class="v">4117 · 4105</span></div>
+      <div class="fld"><span class="k">Management</span><span class="v">Move to BE +30</span></div>
+    </div>
+  </div>
+  <p class="sec-sub" style="margin-top:26px;font-size:14px">Every parse runs through sanity checks — stop-loss on the correct side, price near market, sane lot size — before a single order is placed.</p>
 </div></section>
 
 <!-- HOW -->
