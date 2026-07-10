@@ -140,7 +140,7 @@
       <!-- 1 license -->
       <div class="step on" data-s="0">
         <h3>Activate your license</h3><div class="lead">Enter the key from your purchase email. Each key locks to one computer.</div>
-        <label>License key</label><input value="CP-XAUHQ-4F9A-22B7-QK31" spellcheck="false">
+        <label>License key</label><input value="CP-PRO-4F9A-22B7-QK31" spellcheck="false">
         <label>Email</label><input value="you@email.com">
         <div class="nav2"><span></span><button class="btn p" onclick="go(1)">Activate →</button></div>
       </div>
@@ -153,19 +153,8 @@
       </div>
       <!-- 3 channel (verified list + AI) -->
       <div class="step" data-s="2">
-        <h3>Connect your signals channel</h3><div class="lead">Pick a verified channel, or connect <b>any</b> channel and let AI learn its format.</div>
-        <div class="ctabs">
-          <div class="ctab on" id="ctVer" onclick="ctab('ver')">Verified channels</div>
-          <div class="ctab" id="ctAI" onclick="ctab('ai')">Connect any channel <span class="b">AI · BETA</span></div>
-        </div>
-        <!-- verified -->
-        <div class="cpane on" id="paneVer">
-          <div class="pick sel" onclick="pickGrp(this)"><div class="ic">🏛️</div><div><div class="t">XAUHQ VIP <span class="vbadge">VERIFIED</span></div><div class="d">Gold · SELL/BUY + TP1–TP4 ladder · zone limits</div></div><div class="chk">SELECTED ✓</div></div>
-          <div class="pick" onclick="pickGrp(this)"><div class="ic">⚜️</div><div><div class="t">Gold Platinum VIP <span class="vbadge">VERIFIED</span></div><div class="d">Gold · market + second-limit grid · breakeven mgmt</div></div><div class="chk">SELECTED ✓</div></div>
-          <div class="pick" onclick="pickGrp(this)"><div class="ic">📈</div><div><div class="t">FX Majors Signals <span class="vbadge">VERIFIED</span></div><div class="d">EURUSD/GBPUSD · single entry + SL/TP</div></div><div class="chk">SELECTED ✓</div></div>
-        </div>
-        <!-- AI -->
-        <div class="cpane" id="paneAI">
+        <h3>Connect your signals channel</h3><div class="lead">Paste your Telegram channel — CopyPilot's AI reads it and learns the exact format automatically. Works with <b>any</b> channel.</div>
+        <div class="aiblock">
           <label>Your channel link or @username</label>
           <div class="airow">
             <input id="chLink" value="t.me/mygoldsignals" spellcheck="false">
@@ -205,14 +194,14 @@
       <!-- 4 mt5 -->
       <div class="step" data-s="3">
         <h3>Connect MetaTrader</h3><div class="lead">CopyPilot attaches to your MT5 terminal. Log it into your broker and keep it open.</div>
-        <div class="row"><div><label>Platform</label><select><option>MetaTrader 5</option><option>MetaTrader 4</option></select></div><div><label>Broker server</label><input value="Tickmill-Demo"></div></div>
+        <div class="row"><div><label>Platform</label><select><option>MetaTrader 5</option><option>MetaTrader 4</option></select></div><div><label>Broker server</label><input value="Tickmill-Live"></div></div>
         <label>Account login</label><input value="25343177">
         <div class="pill" style="margin-top:15px"><span class="dot g"></span> Terminal detected ·&nbsp;<b>Algo Trading enabled</b>&nbsp;· balance $10,000.00</div>
         <div class="nav2"><button class="btn g" onclick="go(2)">← Back</button><button class="btn p" onclick="go(4)">Continue →</button></div>
       </div>
       <!-- 5 risk -->
       <div class="step" data-s="4">
-        <h3>Risk &amp; lot settings</h3><div class="lead">How much to trade per signal. Start small on a demo account first.</div>
+        <h3>Risk &amp; lot settings</h3><div class="lead">How much to trade per signal. Start small and scale up as you build trust.</div>
         <div class="row"><div><label>Symbol</label><input value="XAUUSD"></div><div><label>Lot size per entry</label><input value="0.10"></div></div>
         <div class="row"><div><label>Max concurrent trades</label><input value="8"></div><div><label>Max spread (points)</label><input value="40"></div></div>
         <label>Mode</label><select><option>Follow provider exactly (recommended)</option><option>Conservative — first TP only</option></select>
@@ -226,8 +215,8 @@
   <div id="dash" style="display:none">
     <div class="head"><h1>Live Dashboard</h1><p>Everything CopyPilot is doing, in real time.</p></div>
     <div class="statusbar">
-      <span class="pill"><span class="dot g"></span> Telegram ·&nbsp;<b>XAUHQ VIP</b></span>
-      <span class="pill"><span class="dot g"></span> MT5 ·&nbsp;<b>Tickmill-Demo 25343177</b></span>
+      <span class="pill"><span class="dot g"></span> Telegram ·&nbsp;<b>@yourchannel</b>&nbsp;(AI)</span>
+      <span class="pill"><span class="dot g"></span> MT5 ·&nbsp;<b>Tickmill-Live #25343177</b></span>
       <span class="pill"><span class="dot g"></span> Algo Trading ON</span>
       <div class="toggle"><span class="muted" id="botlbl">Bot running</span><div class="switch on" id="botsw" onclick="toggleBot()"><div class="k"></div></div></div>
     </div>
