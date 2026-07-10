@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CopyPilot — Live Demo</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#070a12; --panel:#111a2b; --panel2:#0e1626; --line:#233149;
+    --txt:#eef2f9; --mut:#93a4c4; --acc:#5b8cff; --acc2:#9a6bff; --grad:linear-gradient(120deg,#5b8cff,#9a6bff);
+    --pos:#34d17f; --neg:#e74c3c; --warn:#f2c94c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,Arial;background:var(--bg);color:var(--txt);-webkit-font-smoothing:antialiased;line-height:1.55}
+  .glow{position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:radial-gradient(700px 380px at 15% -5%,rgba(91,140,255,.16),transparent 60%),
+               radial-gradient(680px 400px at 90% 0%,rgba(154,107,255,.14),transparent 60%)}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  .tape{background:var(--warn);color:#241c00;text-align:center;font-size:12.5px;font-weight:600;padding:7px}
+  /* nav */
+  nav{border-bottom:1px solid var(--line);background:rgba(7,10,18,.7);backdrop-filter:blur(12px)}
+  nav .row{display:flex;align-items:center;gap:16px;height:62px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:19px;letter-spacing:-.3px}
+  .brand .m{width:33px;height:33px;border-radius:10px;background:var(--grad);display:grid;place-items:center;
+    box-shadow:0 6px 18px rgba(91,140,255,.4)}
+  .back{margin-left:auto;color:var(--mut);font-size:14px}.back:hover{color:var(--txt)}
+  .seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .seg button{background:transparent;color:var(--mut);border:0;padding:9px 18px;font:600 13.5px 'Inter';cursor:pointer}
+  .seg button.on{background:var(--grad);color:#fff}
+  .head{padding:22px 0 6px}
+  .head h1{font-size:23px;font-weight:800;letter-spacing:-.6px}
+  .head p{color:var(--mut);font-size:13.5px;margin-top:4px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  h2{font-size:14px;color:#cfe0ff;margin:20px 4px 10px;font-weight:700;letter-spacing:-.2px}
+  /* wizard */
+  .stepper{display:flex;gap:8px;margin:18px 0;flex-wrap:wrap}
+  .st{flex:1;min-width:120px;display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:11px;
+    background:var(--panel);border:1px solid var(--line);color:var(--mut);font-size:12.5px;font-weight:500}
+  .st .n{width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:var(--panel2);font-size:12px;font-weight:700}
+  .st.on{border-color:var(--acc);color:var(--txt)} .st.on .n{background:var(--grad);color:#fff}
+  .st.done .n{background:var(--pos);color:#04231a}
+  .step{display:none} .step.on{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .step h3{font-size:21px;font-weight:800;letter-spacing:-.5px}
+  .step .lead{color:var(--mut);font-size:13.5px;margin:6px 0 20px}
+  label{display:block;font-size:12.5px;color:var(--mut);margin:13px 0 6px;font-weight:500}
+  input,select{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;
+    padding:12px 13px;font:400 14px 'Inter';outline:none}
+  input:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(91,140,255,.12)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .btn{font:600 14px 'Inter';border:0;border-radius:11px;padding:12px 22px;cursor:pointer;transition:.15s;
+    display:inline-flex;align-items:center;gap:8px}
+  .btn.p{background:var(--grad);color:#fff;box-shadow:0 8px 22px rgba(91,140,255,.32)}.btn.p:hover{transform:translateY(-1px)}
+  .btn.g{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--txt)}
+  .nav2{display:flex;justify-content:space-between;margin-top:24px}
+  .qr{width:172px;height:172px;border-radius:14px;background:#fff;display:grid;place-items:center;margin:8px auto;padding:11px}
+  .qr svg{width:100%;height:100%}
+  .pick{display:flex;align-items:center;gap:13px;padding:14px;border:1px solid var(--line);border-radius:13px;
+    background:var(--panel2);margin-bottom:11px;cursor:pointer;transition:.15s}
+  .pick:hover{border-color:#33456a} .pick.sel{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+  .pick .ic{width:40px;height:40px;border-radius:11px;background:#1b2740;display:grid;place-items:center;font-size:19px}
+  .pick .t{font-weight:600;font-size:14.5px} .pick .d{font-size:12.5px;color:var(--mut);margin-top:2px}
+  .pick .chk{margin-left:auto;color:var(--acc);font-weight:700;font-size:12px;opacity:0}.pick.sel .chk{opacity:1}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;background:var(--panel2);border:1px solid var(--line);
+    padding:7px 13px;border-radius:22px;color:var(--mut)}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--mut)}
+  .dot.g{background:var(--pos);box-shadow:0 0 8px var(--pos)}
+  .ok{color:var(--pos)} .muted{color:var(--mut)}
+  /* dashboard */
+  .statusbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;padding:13px 15px;margin:16px 0 14px}
+  .toggle{margin-left:auto;display:flex;align-items:center;gap:11px;font-size:13px}
+  .switch{width:46px;height:26px;border-radius:20px;background:#2c3a54;position:relative;cursor:pointer;transition:.2s}
+  .switch.on{background:var(--pos)} .switch .k{width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+  .switch.on .k{left:23px}
+  .badges{display:flex;gap:9px;flex-wrap:wrap;margin:4px 0 2px}
+  .badge{display:flex;align-items:center;gap:7px;font-size:12px;background:#0f2318;border:1px solid #1f5334;color:#79e2a4;
+    padding:7px 12px;border-radius:22px;font-weight:500}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin-top:12px}
+  .kpi .l{color:var(--mut);font-size:12px}.kpi .v{font-size:23px;font-weight:800;margin-top:5px;letter-spacing:-.6px}
+  .two{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-top:14px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--mut);font-weight:600;background:#0f1826;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  .feed{max-height:262px;overflow:auto}
+  .row2{display:flex;gap:11px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line);font-size:13px}
+  .tm{color:var(--mut);width:74px;flex:none;font-variant-numeric:tabular-nums}
+  .tag{font-size:10.5px;padding:3px 9px;border-radius:20px;font-weight:600;flex:none}
+  .tag.op{background:#0f2318;color:#79e2a4}.tag.tp{background:#0e2038;color:#7fb0ff}
+  .tag.cl{background:#2a1416;color:#f2a1a1}.tag.info{background:#1a2236;color:#9fb2d0}
+  .stat{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0}
+  .foot{color:var(--mut);font-size:11.5px;text-align:center;margin:24px 0 12px}
+  @media(max-width:820px){.two{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="tape">🚧 DEMO — mock data. Nothing is connected and no trades are placed.</div>
+<nav><div class="wrap row">
+  <div class="brand"><span class="m"><svg viewBox="0 0 40 40" width="20" height="20" fill="none" style="display:block"><path d="M7 20 L33 7 L25.5 33 L21 23 Z" fill="#fff"/><path d="M21 23 L33 7 L25.5 33 Z" fill="rgba(0,0,0,.2)"/></svg></span> CopyPilot</div>
+  <div class="seg" style="margin-left:20px">
+    <button id="tabWiz" class="on" onclick="show('wiz')">Onboarding</button>
+    <button id="tabDash" onclick="show('dash')">Live Dashboard</button>
+  </div>
+  <a class="back" href="index.html">← Back to site</a>
+</div></nav>
+
+<div class="wrap">
+  <!-- ONBOARDING -->
+  <div id="wiz">
+    <div class="head"><h1>Set up CopyPilot</h1><p>Guided setup — no coding, no config files. (Demo — nothing is saved.)</p></div>
+    <div class="stepper" id="stepper"></div>
+    <div class="card">
+      <div class="step on" data-s="0">
+        <h3>Activate your license</h3><div class="lead">Enter the key from your purchase email. Each key locks to one computer.</div>
+        <label>License key</label><input value="CP-XAUHQ-4F9A-22B7-QK31" spellcheck="false">
+        <label>Email</label><input value="you@email.com">
+        <div class="nav2"><span></span><button class="btn p" onclick="go(1)">Activate →</button></div>
+      </div>
+      <div class="step" data-s="1">
+        <h3>Connect Telegram</h3><div class="lead">Scan with Telegram on your phone → Settings → Devices → Link Desktop Device. Your session stays on your PC — we never see it.</div>
+        <div class="qr" id="qr"></div>
+        <div style="text-align:center" class="muted">Waiting for scan… <span class="ok" id="tgok" style="display:none">✓ Linked as @you</span></div>
+        <div class="nav2"><button class="btn g" onclick="go(0)">← Back</button><button class="btn p" onclick="go(2)">Continue →</button></div>
+      </div>
+      <div class="step" data-s="2">
+        <h3>Choose your signals channel</h3><div class="lead">Pick the channel you're subscribed to — CopyPilot understands each provider's exact format.</div>
+        <div class="pick sel" onclick="pickGrp(this)"><div class="ic">🏛️</div><div><div class="t">XAUHQ VIP</div><div class="d">Gold · SELL/BUY + TP1–TP4 ladder · zone limits</div></div><div class="chk">SELECTED ✓</div></div>
+        <div class="pick" onclick="pickGrp(this)"><div class="ic">⚜️</div><div><div class="t">Gold Platinum VIP</div><div class="d">Gold · market + second-limit grid · breakeven mgmt</div></div><div class="chk">SELECTED ✓</div></div>
+        <div class="pick" onclick="pickGrp(this)"><div class="ic">📈</div><div><div class="t">FX Majors Signals</div><div class="d">EURUSD/GBPUSD · single entry + SL/TP</div></div><div class="chk">SELECTED ✓</div></div>
+        <div class="nav2"><button class="btn g" onclick="go(1)">← Back</button><button class="btn p" onclick="go(3)">Continue →</button></div>
+      </div>
+      <div class="step" data-s="3">
+        <h3>Connect MetaTrader</h3><div class="lead">CopyPilot attaches to your MT5 terminal. Log it into your broker and keep it open.</div>
+        <div class="row"><div><label>Platform</label><select><option>MetaTrader 5</option><option>MetaTrader 4</option></select></div><div><label>Broker server</label><input value="Tickmill-Demo"></div></div>
+        <label>Account login</label><input value="25343177">
+        <div class="pill" style="margin-top:15px"><span class="dot g"></span> Terminal detected ·&nbsp;<b>Algo Trading enabled</b>&nbsp;· balance $10,000.00</div>
+        <div class="nav2"><button class="btn g" onclick="go(2)">← Back</button><button class="btn p" onclick="go(4)">Continue →</button></div>
+      </div>
+      <div class="step" data-s="4">
+        <h3>Risk &amp; lot settings</h3><div class="lead">How much to trade per signal. Start small on a demo account first.</div>
+        <div class="row"><div><label>Symbol</label><input value="XAUUSD"></div><div><label>Lot size per entry</label><input value="0.10"></div></div>
+        <div class="row"><div><label>Max concurrent trades</label><input value="8"></div><div><label>Max spread (points)</label><input value="40"></div></div>
+        <label>Mode</label><select><option>Follow provider exactly (recommended)</option><option>Conservative — first TP only</option></select>
+        <div class="nav2"><button class="btn g" onclick="go(3)">← Back</button><button class="btn p" onclick="finish()">Finish setup ✓</button></div>
+      </div>
+    </div>
+    <div class="foot">CopyPilot is a trading tool, not financial advice. Trading involves substantial risk of loss.</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dash" style="display:none">
+    <div class="head"><h1>Live Dashboard</h1><p>Everything CopyPilot is doing, in real time.</p></div>
+    <div class="statusbar">
+      <span class="pill"><span class="dot g"></span> Telegram ·&nbsp;<b>XAUHQ VIP</b></span>
+      <span class="pill"><span class="dot g"></span> MT5 ·&nbsp;<b>Tickmill-Demo 25343177</b></span>
+      <span class="pill"><span class="dot g"></span> Algo Trading ON</span>
+      <div class="toggle"><span class="muted" id="botlbl">Bot running</span><div class="switch on" id="botsw" onclick="toggleBot()"><div class="k"></div></div></div>
+    </div>
+    <div class="badges">
+      <span class="badge">✓ Auto-reconnect</span><span class="badge">✓ Missed-signal recovery (60s poll)</span>
+      <span class="badge">✓ 24/7 watchdog</span><span class="badge">✓ Duplicate-trade protection</span>
+    </div>
+    <div class="cards">
+      <div class="card kpi"><div class="l">Balance</div><div class="v">$10,247.30</div></div>
+      <div class="card kpi"><div class="l">Equity</div><div class="v" id="eq">$10,262.00</div></div>
+      <div class="card kpi"><div class="l">📈 Growth since start</div><div class="v" style="color:var(--pos)">+2.47%</div></div>
+      <div class="card kpi"><div class="l">Floating P/L</div><div class="v" id="fl" style="color:var(--pos)">+$14.70</div></div>
+      <div class="card kpi"><div class="l">Realized today</div><div class="v" style="color:var(--pos)">+$132.10</div></div>
+      <div class="card kpi"><div class="l">Open / Pending</div><div class="v">1 / 1</div></div>
+    </div>
+    <div class="two">
+      <div>
+        <h2>🟢 Open positions</h2>
+        <div class="card" style="padding:6px">
+          <table><tr><th>Time</th><th>Signal</th><th>Type</th><th>Lot</th><th>Open</th><th>Now</th><th>SL</th><th>TP</th><th>P/L</th></tr>
+          <tr><td>18:08</td><td>#12</td><td>SELL</td><td>0.10</td><td>4127.4</td><td id="px">4125.9</td><td>4137.0</td><td>4117.0</td><td id="pl2" style="color:var(--pos)">+$14.70</td></tr></table>
+        </div>
+        <h2>🟡 Pending orders</h2>
+        <div class="card" style="padding:6px">
+          <table><tr><th>Placed</th><th>Signal</th><th>Type</th><th>Lot</th><th>Price</th><th>SL</th><th>TP</th></tr>
+          <tr><td>18:08</td><td>#12</td><td>SELL LIMIT</td><td>0.10</td><td>4132.0</td><td>4137.0</td><td>4117.0</td></tr></table>
+        </div>
+      </div>
+      <div>
+        <h2>🤖 Live signal feed</h2>
+        <div class="card feed">
+          <div class="row2"><span class="tm">18:08:38</span><span class="tag op">OPENED</span><span>#12 SELL @ 4127.4 + limit 4132</span></div>
+          <div class="row2"><span class="tm">18:04:10</span><span class="tag info">SIGNAL</span><span>#12 GOLD SELL @ 4127</span></div>
+          <div class="row2"><span class="tm">15:16:25</span><span class="tag cl">CLOSED</span><span>#11 FULL TP +160 pips · +$132.10</span></div>
+          <div class="row2"><span class="tm">14:51:00</span><span class="tag tp">TP-SET</span><span>#11 limits filled · TP1 4112</span></div>
+          <div class="row2"><span class="tm">11:50:12</span><span class="tag op">OPENED</span><span>#11 BUY 4102 + 4097 · SL 4092</span></div>
+          <div class="row2"><span class="tm">10:26:44</span><span class="tag cl">REMOVED</span><span>#10 "Remove this" → cancelled</span></div>
+        </div>
+        <h2>This month</h2>
+        <div class="card">
+          <div class="stat"><span class="muted">Signals copied</span><b>34</b></div>
+          <div class="stat"><span class="muted">Win rate</span><b style="color:var(--pos)">68%</b></div>
+          <div class="stat"><span class="muted">Missed signals</span><b style="color:var(--pos)">0</b></div>
+          <div class="stat"><span class="muted">Uptime</span><b>99.9%</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="foot">CopyPilot v1.0 · demo · trading tool, not financial advice · past performance ≠ future results</div>
+  </div>
+</div>
+
+<script>
+  function makeQR(){let s='<svg viewBox="0 0 21 21" shape-rendering="crispEdges">';const seed=[7,25,42,11,88,3,64];let x=1;
+    for(let r=0;r<21;r++)for(let c=0;c<21;c++){x=(x*1103+seed[(r+c)%7])%997;if(x%2===0)s+=`<rect x="${c}" y="${r}" width="1" height="1" fill="#070a12"/>`;}
+    [[0,0],[14,0],[0,14]].forEach(([a,b])=>{s+=`<rect x="${a}" y="${b}" width="7" height="7" fill="#070a12"/><rect x="${a+1}" y="${b+1}" width="5" height="5" fill="#fff"/><rect x="${a+2}" y="${b+2}" width="3" height="3" fill="#070a12"/>`;});
+    return s+'</svg>';}
+  document.getElementById('qr').innerHTML=makeQR();
+  const steps=['License','Telegram','Signals','MetaTrader','Risk'];let cur=0;
+  function drawStepper(){document.getElementById('stepper').innerHTML=steps.map((n,i)=>`<div class="st ${i===cur?'on':''} ${i<cur?'done':''}"><span class="n">${i<cur?'✓':i+1}</span>${n}</div>`).join('');}
+  function go(n){cur=n;drawStepper();document.querySelectorAll('.step').forEach(el=>el.classList.toggle('on',+el.dataset.s===n));
+    if(n===1)setTimeout(()=>{const e=document.getElementById('tgok');if(e)e.style.display='inline';},1300);window.scrollTo({top:0,behavior:'smooth'});}
+  function pickGrp(el){document.querySelectorAll('.pick').forEach(p=>p.classList.remove('sel'));el.classList.add('sel');}
+  function finish(){show('dash');}
+  drawStepper();
+  function show(v){document.getElementById('wiz').style.display=v==='wiz'?'block':'none';document.getElementById('dash').style.display=v==='dash'?'block':'none';
+    document.getElementById('tabWiz').classList.toggle('on',v==='wiz');document.getElementById('tabDash').classList.toggle('on',v==='dash');window.scrollTo({top:0,behavior:'smooth'});}
+  let running=true;
+  function toggleBot(){running=!running;document.getElementById('botsw').classList.toggle('on',running);document.getElementById('botlbl').textContent=running?'Bot running':'Bot paused';}
+  let base=4125.9;
+  setInterval(()=>{if(!running)return;base+=Math.sin(Date.now()/3000)*0.28+(((Date.now()/50|0)%3)-1)*0.05;
+    const pl=Math.max(0,(4127.4-base)*10);document.getElementById('px').textContent=base.toFixed(1);
+    const v='+$'+pl.toFixed(2);document.getElementById('pl2').textContent=v;document.getElementById('fl').textContent=v;
+    document.getElementById('eq').textContent='$'+(10247.30+pl).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});},1200);
+</script>
+</body>
+</html>

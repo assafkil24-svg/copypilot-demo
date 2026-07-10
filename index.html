@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CopyPilot — Telegram signals → MetaTrader, on autopilot</title>
+<meta name="description" content="CopyPilot copies your Telegram trading signals into MetaTrader automatically — with institutional-grade reliability. Demo.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#070a12; --bg2:#0c111d; --panel:#121a2b; --panel2:#18223500; --line:#233149;
+    --txt:#eef2f9; --mut:#93a4c4; --acc:#5b8cff; --acc2:#9a6bff; --grad:linear-gradient(120deg,#5b8cff,#9a6bff);
+    --pos:#34d17f; --warn:#f2c94c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,Arial;background:var(--bg);color:var(--txt);
+    -webkit-font-smoothing:antialiased;line-height:1.6;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 22px}
+  .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  /* glow bg */
+  .glow{position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(700px 380px at 15% -5%, rgba(91,140,255,.18), transparent 60%),
+      radial-gradient(680px 400px at 90% 5%, rgba(154,107,255,.16), transparent 60%);}
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(7,10,18,.7);border-bottom:1px solid var(--line)}
+  nav .row{display:flex;align-items:center;gap:26px;height:66px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:20px;letter-spacing:-.3px}
+  .brand .m{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;font-size:18px;
+    box-shadow:0 6px 20px rgba(91,140,255,.4)}
+  nav .links{display:flex;gap:24px;margin-left:8px}
+  nav .links a{color:var(--mut);font-size:14.5px;font-weight:500}
+  nav .links a:hover{color:var(--txt)}
+  .spacer{margin-left:auto}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-weight:600;font-size:14.5px;
+    border:0;border-radius:11px;padding:12px 20px;cursor:pointer;transition:.15s;white-space:nowrap}
+  .btn.primary{background:var(--grad);color:#fff;box-shadow:0 8px 24px rgba(91,140,255,.35)}
+  .btn.primary:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(91,140,255,.45)}
+  .btn.ghost{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--txt)}
+  .btn.ghost:hover{border-color:var(--acc)}
+  .btn.lg{padding:15px 28px;font-size:16px;border-radius:13px}
+  /* hero */
+  .hero{padding:74px 0 40px;text-align:center}
+  .tagpill{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);
+    border:1px solid var(--line);background:rgba(255,255,255,.03);padding:7px 15px;border-radius:30px;margin-bottom:26px}
+  .tagpill .dot{width:7px;height:7px;border-radius:50%;background:var(--pos);box-shadow:0 0 8px var(--pos)}
+  h1{font-size:clamp(34px,6vw,60px);line-height:1.06;font-weight:900;letter-spacing:-1.6px}
+  .hero p.lead{font-size:clamp(16px,2.4vw,20px);color:var(--mut);max-width:640px;margin:22px auto 0;font-weight:400}
+  .cta{display:flex;gap:14px;justify-content:center;margin-top:34px;flex-wrap:wrap}
+  .microcopy{color:var(--mut);font-size:13px;margin-top:16px}
+  /* product shot */
+  .shot{margin:56px auto 0;max-width:960px;border-radius:18px;border:1px solid var(--line);
+    background:linear-gradient(180deg,#111a2b,#0c1220);box-shadow:0 40px 120px rgba(0,0,0,.6);overflow:hidden}
+  .shot .bar{display:flex;align-items:center;gap:7px;padding:13px 16px;border-bottom:1px solid var(--line)}
+  .shot .bar i{width:11px;height:11px;border-radius:50%;background:#38455e;display:inline-block}
+  .shot .bar .u{margin-left:12px;font-size:12px;color:var(--mut)}
+  .shot .body{padding:20px}
+  .minibar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px}
+  .chip{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--mut);border:1px solid var(--line);
+    background:rgba(255,255,255,.03);padding:7px 12px;border-radius:22px}
+  .chip .g{width:8px;height:8px;border-radius:50%;background:var(--pos);box-shadow:0 0 8px var(--pos)}
+  .minikpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .minikpi{background:#0e1626;border:1px solid var(--line);border-radius:13px;padding:15px}
+  .minikpi .l{font-size:11.5px;color:var(--mut)} .minikpi .v{font-size:22px;font-weight:800;margin-top:4px;letter-spacing:-.5px}
+  .minitable{width:100%;border-collapse:collapse;margin-top:16px;font-size:13px}
+  .minitable th,.minitable td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+  .minitable th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+  /* section */
+  section{padding:78px 0}
+  .eyebrow{color:var(--acc);font-weight:700;font-size:13px;letter-spacing:1.4px;text-transform:uppercase;text-align:center}
+  h2{font-size:clamp(27px,4vw,40px);font-weight:800;letter-spacing:-1px;text-align:center;margin:12px 0 0}
+  .sec-sub{color:var(--mut);text-align:center;max-width:560px;margin:16px auto 0;font-size:16px}
+  /* features */
+  .feat{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+  .fcard{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.005));
+    border:1px solid var(--line);border-radius:16px;padding:26px;transition:.2s}
+  .fcard:hover{border-color:#33456a;transform:translateY(-3px)}
+  .fic{width:46px;height:46px;border-radius:12px;background:rgba(91,140,255,.14);display:grid;place-items:center;font-size:22px;margin-bottom:16px}
+  .fcard h3{font-size:17.5px;font-weight:700;letter-spacing:-.3px}
+  .fcard p{color:var(--mut);font-size:14px;margin-top:8px}
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+  .stepc{position:relative;background:#0e1626;border:1px solid var(--line);border-radius:16px;padding:28px 24px}
+  .stepc .num{font-size:14px;font-weight:800;color:#0a0e18;background:var(--grad);width:30px;height:30px;border-radius:9px;
+    display:grid;place-items:center;margin-bottom:16px}
+  .stepc h3{font-size:18px;font-weight:700}.stepc p{color:var(--mut);font-size:14px;margin-top:7px}
+  /* reliability strip */
+  .rely{background:linear-gradient(120deg,rgba(91,140,255,.09),rgba(154,107,255,.09));
+    border:1px solid var(--line);border-radius:22px;padding:44px;margin-top:20px}
+  .rely .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
+  .rely h2{text-align:left;margin:8px 0 0}.rely .sec-sub{text-align:left;margin:16px 0 0}
+  .checks{display:grid;gap:14px}
+  .chk{display:flex;gap:13px;align-items:flex-start}
+  .chk .i{flex:none;width:26px;height:26px;border-radius:8px;background:rgba(52,209,127,.15);color:var(--pos);
+    display:grid;place-items:center;font-weight:800;font-size:14px}
+  .chk b{font-size:15px}.chk span{color:var(--mut);font-size:13.5px;display:block}
+  /* pricing */
+  .price{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+  .pcard{background:#0e1626;border:1px solid var(--line);border-radius:18px;padding:30px 26px;display:flex;flex-direction:column}
+  .pcard.pop{border-color:var(--acc);box-shadow:0 20px 60px rgba(91,140,255,.18);position:relative}
+  .pcard.pop .flag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;
+    font-size:11.5px;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:.5px}
+  .pcard .pn{font-weight:700;font-size:16px;color:var(--mut)}
+  .pcard .amt{font-size:40px;font-weight:900;letter-spacing:-1.5px;margin:12px 0 2px}
+  .pcard .amt small{font-size:15px;color:var(--mut);font-weight:500}
+  .pcard ul{list-style:none;margin:20px 0;display:grid;gap:11px}
+  .pcard li{font-size:14px;color:var(--mut);display:flex;gap:10px}.pcard li::before{content:"✓";color:var(--pos);font-weight:800}
+  .pcard .btn{margin-top:auto;justify-content:center}
+  /* faq */
+  .faq{max-width:760px;margin:48px auto 0;display:grid;gap:12px}
+  .qa{background:#0e1626;border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+  .qa h4{font-size:15.5px;font-weight:600}.qa p{color:var(--mut);font-size:14px;margin-top:8px}
+  /* final cta */
+  .final{text-align:center;background:linear-gradient(120deg,rgba(91,140,255,.12),rgba(154,107,255,.12));
+    border:1px solid var(--line);border-radius:24px;padding:64px 30px;margin-top:20px}
+  /* footer */
+  footer{border-top:1px solid var(--line);padding:40px 0;margin-top:70px}
+  footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+  .disc{color:var(--mut);font-size:12px;max-width:640px;margin-top:18px;line-height:1.7}
+  .demo-tape{background:var(--warn);color:#241c00;text-align:center;font-size:12.5px;font-weight:600;padding:7px}
+  @media(max-width:860px){
+    nav .links{display:none}
+    .feat,.steps,.price{grid-template-columns:1fr}
+    .rely .grid{grid-template-columns:1fr}
+    .minikpis{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="demo-tape">🚧 DEMO SITE — mock product, mock data. Nothing here is connected or for sale yet.</div>
+
+<nav><div class="wrap row">
+  <div class="brand"><span class="m"><svg viewBox="0 0 40 40" width="21" height="21" fill="none" style="display:block"><path d="M7 20 L33 7 L25.5 33 L21 23 Z" fill="#fff"/><path d="M21 23 L33 7 L25.5 33 Z" fill="rgba(0,0,0,.2)"/></svg></span> CopyPilot</div>
+  <div class="links">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#reliability">Reliability</a>
+    <a href="#pricing">Pricing</a>
+  </div>
+  <div class="spacer"></div>
+  <a class="btn primary" href="app.html">Try live demo →</a>
+</div></nav>
+
+<!-- HERO -->
+<header class="hero"><div class="wrap">
+  <div class="tagpill"><span class="dot"></span> Now copying Gold &amp; FX signals in real time</div>
+  <h1>Your Telegram signals,<br><span class="grad">traded automatically.</span></h1>
+  <p class="lead">CopyPilot reads your signal channel and places the trades in MetaTrader for you —
+     entries, stop-loss, take-profit, and management — with reliability built for 24/7 markets.</p>
+  <div class="cta">
+    <a class="btn primary lg" href="app.html">Launch live demo →</a>
+    <a class="btn ghost lg" href="#how">See how it works</a>
+  </div>
+  <div class="microcopy">No card. No install for the demo. Runs on your PC or VPS in production.</div>
+
+  <!-- product shot -->
+  <div class="shot">
+    <div class="bar"><i></i><i></i><i></i><span class="u">CopyPilot — Live Dashboard</span></div>
+    <div class="body">
+      <div class="minibar">
+        <span class="chip"><span class="g"></span> Telegram · XAUHQ VIP</span>
+        <span class="chip"><span class="g"></span> MT5 · Tickmill-Demo</span>
+        <span class="chip"><span class="g"></span> Algo Trading ON</span>
+        <span class="chip"><span class="g"></span> Bot running</span>
+      </div>
+      <div class="minikpis">
+        <div class="minikpi"><div class="l">Balance</div><div class="v">$10,247</div></div>
+        <div class="minikpi"><div class="l">Growth</div><div class="v grad">+2.47%</div></div>
+        <div class="minikpi"><div class="l">Floating</div><div class="v" style="color:var(--pos)">+$14.70</div></div>
+        <div class="minikpi"><div class="l">Missed</div><div class="v" style="color:var(--pos)">0</div></div>
+      </div>
+      <table class="minitable">
+        <tr><th>Time</th><th>Signal</th><th>Type</th><th>Entry</th><th>SL</th><th>TP</th><th>P/L</th></tr>
+        <tr><td>18:08</td><td>#12</td><td>SELL</td><td>4127.4</td><td>4137.0</td><td>4117.0</td><td style="color:var(--pos)">+$14.70</td></tr>
+        <tr><td>15:16</td><td>#11</td><td>BUY</td><td>4102.0</td><td>4092.0</td><td>4112.0</td><td style="color:var(--pos)">+$132.10</td></tr>
+      </table>
+    </div>
+  </div>
+</div></header>
+
+<!-- FEATURES -->
+<section id="features"><div class="wrap">
+  <div class="eyebrow">Features</div>
+  <h2>Everything a serious copier needs</h2>
+  <p class="sec-sub">Not a fragile script. A tool built to keep copying while you sleep.</p>
+  <div class="feat">
+    <div class="fcard"><div class="fic">🧠</div><h3>Understands your provider</h3><p>Parses each channel's exact format — market/limit entries, zones, grids, and TP1–TP4 ladders.</p></div>
+    <div class="fcard"><div class="fic">⚡</div><h3>Instant execution</h3><p>Signal in Telegram → order in MetaTrader in under a second, with your stop-loss and targets attached.</p></div>
+    <div class="fcard"><div class="fic">🛰️</div><h3>Never misses a signal</h3><p>A 60-second poll + auto-reconnect recovers anything the live feed drops. Missed-signal count: zero.</p></div>
+    <div class="fcard"><div class="fic">🛡️</div><h3>24/7 watchdog</h3><p>Self-restarts on crash or hang, catches up on downtime, and protects against duplicate trades.</p></div>
+    <div class="fcard"><div class="fic">🎛️</div><h3>Full management</h3><p>Move-to-breakeven, partial close, re-entry, and "cancel/remove" — exactly as the provider instructs.</p></div>
+    <div class="fcard"><div class="fic">📊</div><h3>Live dashboard</h3><p>Balance, growth, open positions, and a real-time signal feed — private locally, or a shareable page.</p></div>
+  </div>
+</div></section>
+
+<!-- HOW -->
+<section id="how" style="padding-top:20px"><div class="wrap">
+  <div class="eyebrow">How it works</div>
+  <h2>Live in three steps</h2>
+  <p class="sec-sub">A guided setup — no coding, no config files.</p>
+  <div class="steps">
+    <div class="stepc"><div class="num">1</div><h3>Connect Telegram</h3><p>Scan a QR to link your account. Your session stays on your machine — we never hold it.</p></div>
+    <div class="stepc"><div class="num">2</div><h3>Connect MetaTrader</h3><p>Point CopyPilot at your MT5 terminal and pick your risk per trade. That's it.</p></div>
+    <div class="stepc"><div class="num">3</div><h3>It trades for you</h3><p>Every signal is copied and managed automatically. Watch it live on your dashboard.</p></div>
+  </div>
+</div></section>
+
+<!-- RELIABILITY -->
+<section id="reliability"><div class="wrap">
+  <div class="rely"><div class="grid">
+    <div>
+      <div class="eyebrow" style="text-align:left">Why CopyPilot</div>
+      <h2>Most copiers quietly miss trades.<br><span class="grad">This one doesn't.</span></h2>
+      <p class="sec-sub">Telegram drops connections, PCs hang, brokers reject bad stops. CopyPilot was hardened
+        against every one of those — the reliability is the product.</p>
+    </div>
+    <div class="checks">
+      <div class="chk"><div class="i">✓</div><div><b>Missed-signal recovery</b><span>60-second poll pulls anything the live feed dropped.</span></div></div>
+      <div class="chk"><div class="i">✓</div><div><b>Hang detection &amp; auto-reconnect</b><span>Detects a dead connection that still "looks" alive.</span></div></div>
+      <div class="chk"><div class="i">✓</div><div><b>Watchdog + catch-up</b><span>Restarts on crash and back-fills any downtime gap.</span></div></div>
+      <div class="chk"><div class="i">✓</div><div><b>Duplicate-trade protection</b><span>The same signal is never entered twice.</span></div></div>
+      <div class="chk"><div class="i">✓</div><div><b>Broker-safe orders</b><span>Handles bad stops &amp; "remove" instructions cleanly.</span></div></div>
+    </div>
+  </div></div>
+</div></section>
+
+<!-- PRICING -->
+<section id="pricing" style="padding-top:20px"><div class="wrap">
+  <div class="eyebrow">Pricing</div>
+  <h2>Simple, honest pricing</h2>
+  <p class="sec-sub">Illustrative demo pricing. Cancel anytime.</p>
+  <div class="price">
+    <div class="pcard">
+      <div class="pn">Starter</div>
+      <div class="amt">$29<small> / mo</small></div>
+      <ul><li>1 signal channel</li><li>1 MT5 account</li><li>Live dashboard</li><li>Email support</li></ul>
+      <a class="btn ghost" href="app.html">Try the demo</a>
+    </div>
+    <div class="pcard pop">
+      <div class="flag">MOST POPULAR</div>
+      <div class="pn">Pro</div>
+      <div class="amt">$59<small> / mo</small></div>
+      <ul><li>Up to 3 channels</li><li>2 MT5 accounts</li><li>Priority parser updates</li><li>Shareable public dashboard</li><li>Priority support</li></ul>
+      <a class="btn primary" href="app.html">Try the demo</a>
+    </div>
+    <div class="pcard">
+      <div class="pn">Lifetime</div>
+      <div class="amt">$499<small> once</small></div>
+      <ul><li>Everything in Pro</li><li>Unlimited channels</li><li>Lifetime updates</li><li>1-on-1 setup call</li></ul>
+      <a class="btn ghost" href="app.html">Try the demo</a>
+    </div>
+  </div>
+</div></section>
+
+<!-- FAQ -->
+<section style="padding-top:20px"><div class="wrap">
+  <div class="eyebrow">FAQ</div>
+  <h2>Good questions</h2>
+  <div class="faq">
+    <div class="qa"><h4>Do you see my Telegram or broker credentials?</h4><p>No. CopyPilot runs on your machine; your Telegram session and MT5 login never leave your PC.</p></div>
+    <div class="qa"><h4>Which signal channels are supported?</h4><p>Any channel we've built a parser for. Each provider's format is different, and we keep parsers updated as they change.</p></div>
+    <div class="qa"><h4>Does it run 24/7?</h4><p>It runs whenever your PC (or a VPS) is on. For round-the-clock copying we recommend a low-cost Forex VPS.</p></div>
+    <div class="qa"><h4>Is this financial advice?</h4><p>No. CopyPilot is an execution tool. Trading carries substantial risk of loss — you are responsible for your own decisions.</p></div>
+  </div>
+</div></section>
+
+<!-- FINAL CTA -->
+<section style="padding-top:20px"><div class="wrap">
+  <div class="final">
+    <h2>See it running in 10 seconds</h2>
+    <p class="sec-sub" style="margin-left:auto;margin-right:auto">Open the interactive demo — onboarding wizard and live dashboard, no signup.</p>
+    <div class="cta"><a class="btn primary lg" href="app.html">Launch live demo →</a></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="row">
+    <div class="brand"><span class="m"><svg viewBox="0 0 40 40" width="21" height="21" fill="none" style="display:block"><path d="M7 20 L33 7 L25.5 33 L21 23 Z" fill="#fff"/><path d="M21 23 L33 7 L25.5 33 Z" fill="rgba(0,0,0,.2)"/></svg></span> CopyPilot</div>
+    <div class="links" style="display:flex;gap:22px;color:var(--mut);font-size:14px">
+      <a href="#features">Features</a><a href="#pricing">Pricing</a><a href="app.html">Demo</a>
+    </div>
+  </div>
+  <p class="disc">CopyPilot is a demonstration project. It is a trading automation tool, not investment advice, portfolio
+    management, or a solicitation. CFDs and leveraged trading carry a high risk of losing money rapidly; most retail
+    accounts lose money. Past performance does not guarantee future results. All figures on this site are illustrative mock data.</p>
+</div></footer>
+</body>
+</html>
