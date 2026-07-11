@@ -70,6 +70,17 @@
   .pick .d{font-size:12.5px;color:var(--mut);margin-top:2px} .pick .chk{margin-left:auto;color:var(--acc);font-weight:700;font-size:12px;opacity:0}.pick.sel .chk{opacity:1}
   /* AI detect */
   .airow{display:flex;gap:10px}.airow input{flex:1}
+  .chan-list{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel2)}
+  .chan{display:flex;align-items:center;gap:13px;padding:13px 15px;border-bottom:1px solid var(--line);cursor:pointer;transition:.12s}
+  .chan:last-child{border-bottom:0}.chan:hover{background:rgba(255,255,255,.03)}
+  .chan.sel{background:rgba(91,140,255,.1);box-shadow:inset 3px 0 0 var(--acc)}
+  .chan .av{width:42px;height:42px;border-radius:12px;background:#1b2740;display:grid;place-items:center;font-size:20px;flex:none}
+  .chan .cn{font-weight:600;font-size:14.5px}
+  .chan .cl{font-size:12.5px;color:var(--mut);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:330px}
+  .chan .cmeta{margin-left:auto;font-size:12px;color:var(--mut);flex:none}
+  .chan .cpick{margin-left:auto;color:var(--acc);font-weight:700;font-size:12px;opacity:0;flex:none}
+  .chan.sel .cpick{opacity:1}.chan.sel .cmeta{display:none}
+  .notsig{margin-top:14px;padding:13px 15px;border:1px solid #5a4a1e;background:#2a2410;color:var(--warn);border-radius:11px;font-size:13px}
   .ai-stage{margin-top:18px;border:1px solid var(--line);border-radius:14px;background:var(--panel2);overflow:hidden;display:none}
   .ai-stage.show{display:block;animation:fade .3s ease}
   .ai-scan{padding:22px}
@@ -153,17 +164,19 @@
       </div>
       <!-- 3 channel (verified list + AI) -->
       <div class="step" data-s="2">
-        <h3>Connect your signals channel</h3><div class="lead">Paste your Telegram channel — CopyPilot's AI reads it and learns the exact format automatically. Works with <b>any</b> channel.</div>
+        <h3>Pick the channel to copy</h3><div class="lead">These are the Telegram channels <b>you're already a member of</b>. Click the one you want CopyPilot to copy — it reads it and learns the format with AI.</div>
         <div class="aiblock">
-          <label>Your channel link or @username</label>
-          <div class="airow">
-            <input id="chLink" value="t.me/mygoldsignals" spellcheck="false">
-            <button class="btn p" id="analyzeBtn" onclick="analyze()">✨ Analyze with AI</button>
+          <div class="chan-list">
+            <div class="chan" onclick="selectChan(this,'Gold Signals VIP',true)"><div class="av">🏛️</div><div><div class="cn">Gold Signals VIP</div><div class="cl">💵 GOLD SELL now 4127 · SL 4137 · TP 4117</div></div><span class="cmeta">2,340 members</span><span class="cpick">SELECT ✓</span></div>
+            <div class="chan" onclick="selectChan(this,'FX Pro Signals',true)"><div class="av">📈</div><div><div class="cn">FX Pro Signals</div><div class="cl">EURUSD BUY 1.0845 · SL 1.0820 · TP 1.0900</div></div><span class="cmeta">870 members</span><span class="cpick">SELECT ✓</span></div>
+            <div class="chan" onclick="selectChan(this,'Crypto Calls Premium',true)"><div class="av">🪙</div><div><div class="cn">Crypto Calls Premium</div><div class="cl">BTC long 61,200 · stop 60,400 · target 63k</div></div><span class="cmeta">5,120 members</span><span class="cpick">SELECT ✓</span></div>
+            <div class="chan" onclick="selectChan(this,'Family',false)"><div class="av">👨‍👩‍👧</div><div><div class="cn">Family</div><div class="cl">See you at dinner 🙂</div></div><span class="cmeta">6 members</span><span class="cpick">SELECT ✓</span></div>
+            <div class="chan" onclick="selectChan(this,'Market News',false)"><div class="av">📰</div><div><div class="cn">Market News</div><div class="cl">Fed holds rates steady…</div></div><span class="cmeta">41k members</span><span class="cpick">SELECT ✓</span></div>
           </div>
-          <div class="muted" style="font-size:12px;margin-top:8px">CopyPilot reads your last messages and learns the format automatically. Beta — always confirm the first few trades.</div>
+          <div class="notsig" id="notSig" style="display:none">⚠️ This channel doesn't look like a trading-signals channel. Pick one with entries, stop-loss and take-profit.</div>
           <div class="ai-stage" id="aiStage">
             <div class="ai-scan">
-              <div class="scanline" id="sl1"><span class="ic"><span class="spin"></span></span> Reading last 20 messages from <b style="margin-left:4px">@mygoldsignals</b></div>
+              <div class="scanline" id="sl1"><span class="ic"><span class="spin"></span></span> Reading last 20 messages from <b style="margin-left:4px" id="chName">the channel</b></div>
               <div class="scanline" id="sl2"><span class="ic"><span class="spin"></span></span> Detecting entries, stop-loss &amp; take-profit…</div>
               <div class="scanline" id="sl3"><span class="ic"><span class="spin"></span></span> Learning management rules (BE, partials, re-entry)…</div>
             </div>
@@ -187,7 +200,7 @@
               </div>
             </div>
           </div>
-          <div class="pill" id="aiPicked" style="display:none;margin-top:14px"><span class="dot g"></span> Connected ·&nbsp;<b>@mygoldsignals</b>&nbsp;(AI format)</div>
+          <div class="pill" id="aiPicked" style="display:none;margin-top:14px"><span class="dot g"></span> Connected ·&nbsp;<b id="pickedName">the channel</b>&nbsp;· AI format learned</div>
         </div>
         <div class="nav2"><button class="btn g" onclick="go(1)">← Back</button><button class="btn p" onclick="go(3)">Continue →</button></div>
       </div>
@@ -282,19 +295,27 @@
   function ctab(w){document.getElementById('ctVer').classList.toggle('on',w==='ver');document.getElementById('ctAI').classList.toggle('on',w==='ai');
     document.getElementById('paneVer').classList.toggle('on',w==='ver');document.getElementById('paneAI').classList.toggle('on',w==='ai');}
   // AI analyze animation
+  let selChan='';
+  function selectChan(el,name,isSignal){
+    document.querySelectorAll('.chan').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');
+    selChan=name;document.getElementById('aiPicked').style.display='none';
+    if(!isSignal){document.getElementById('notSig').style.display='block';document.getElementById('aiStage').classList.remove('show');return;}
+    document.getElementById('notSig').style.display='none';
+    document.getElementById('chName').textContent=name;
+    analyze();
+  }
   function analyze(){
-    const btn=document.getElementById('analyzeBtn');btn.disabled=true;btn.textContent='Analyzing…';
     document.getElementById('aiStage').classList.add('show');
     document.getElementById('aiResult').classList.remove('show');
+    document.getElementById('confbar').style.width='0';
     ['sl1','sl2','sl3'].forEach(id=>{const e=document.getElementById(id);e.classList.remove('act','done');e.querySelector('.ic').innerHTML='<span class="spin"></span>';});
     const seq=[['sl1',700],['sl2',1500],['sl3',2300]];
     document.getElementById('sl1').classList.add('act');
     seq.forEach(([id,t],i)=>{setTimeout(()=>{const e=document.getElementById(id);e.classList.add('act','done');e.querySelector('.ic').innerHTML='✓';
       const nx=seq[i+1];if(nx)document.getElementById(nx[0]).classList.add('act');},t);});
-    setTimeout(()=>{document.getElementById('aiResult').classList.add('show');setTimeout(()=>document.getElementById('confbar').style.width='96%',60);
-      btn.disabled=false;btn.textContent='✨ Analyze with AI';},2900);
+    setTimeout(()=>{document.getElementById('aiResult').classList.add('show');setTimeout(()=>document.getElementById('confbar').style.width='96%',60);},2900);
   }
-  function pickAI(){document.getElementById('aiPicked').style.display='inline-flex';}
+  function pickAI(){document.getElementById('pickedName').textContent=selChan||'the channel';document.getElementById('aiPicked').style.display='inline-flex';}
   function finish(){show('dash');}
   drawStepper();
   function show(v){document.getElementById('wiz').style.display=v==='wiz'?'block':'none';document.getElementById('dash').style.display=v==='dash'?'block':'none';
